@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rail demo</title>
+        <style>
+            html,
+            body {
+                background-color: rgb(37, 37, 37);
+                margin: 0;
+            }
+
+            canvas {
+                display: block;
+                box-sizing: content-box;
+                position: relative;
+            }
+
+            .hero-section {
+                display: flex;
+                position: relative;
+            }
+
+            .wedge {
+                flex-grow: 1;
+            }
+
+            .hero-section::before {
+                position: absolute;
+                top: 0;
+                right: 0;
+                content: '';
+                height: 1660px;
+                width: 100%;
+                background: url('./bg.jpeg') top right no-repeat;
+                background-size: contain;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="hero-section">
+            <div class="wedge"></div>
+            <div>
+                <canvas id="movieClip" width="780" height="780"></canvas>
+            </div>
+        </div>
+        <script type="text/javascript" src="./app2.js"></script>
+    </body>
+</html>
