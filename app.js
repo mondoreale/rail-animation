@@ -1,4 +1,11 @@
-function movieClip({ canvas, numberOfFrames, filepathFn, fps = 20 } = {}) {
+function movieClip({
+    canvas,
+    numberOfFrames,
+    srcFn,
+    srcsetFn,
+    sizesFn,
+    fps = 20,
+} = {}) {
     if (!canvas) {
         throw new Error('Canvas element is missing')
     }
@@ -11,23 +18,25 @@ function movieClip({ canvas, numberOfFrames, filepathFn, fps = 20 } = {}) {
 
     ctx.imageSmoothingEnabled = false
 
-    function getFilePathname(frameNo) {
-        if (typeof filepathFn === 'function') {
-            return filepathFn(frameNo)
-        }
-
-        return `./frames/${frameNo}.png`
-    }
-
     function getImage(index) {
         return new Promise((resolve, reject) => {
             const image = new Image()
 
-            image.addEventListener('load', () => void resolve(image))
+            image.addEventListener('load', () => {
+                resolve(image)
+            })
 
             image.addEventListener('error', () => void reject())
 
-            image.src = getFilePathname(index)
+            if (typeof srcsetFn === 'function') {
+                image.srcset = srcsetFn(index)
+            }
+
+            if (typeof sizesFn === 'function') {
+                image.sizes = sizesFn(index)
+            }
+
+            image.src = srcFn(index)
         })
     }
 
@@ -119,15 +128,26 @@ function movieClip({ canvas, numberOfFrames, filepathFn, fps = 20 } = {}) {
         document.body.style.backgroundColor = e.target.value
     })
 
-    function getFilePathname(frameNo) {
-        return `./frames/2023 Rail Header Image-v3Comped-Frame-${`000${frameNo}`.slice(
-            -3
-        )}.png`
+    function srcFn(frameNo, size = '1024') {
+        return `./frames/frame_${size}w_${`000${frameNo}`.slice(-3)}.png`
+    }
+
+    function srcsetFn(frameNo) {
+        return `${srcFn(frameNo, 480)} 480w, ${srcFn(
+            frameNo,
+            720
+        )} 720w, ${srcFn(frameNo, 1024)} 1024w`
+    }
+
+    function sizesFn() {
+        return '(max-width: 767px) 480px, ((min-width: 768px) and (max-width: 1199px)) 720px, (min-width: 1200px) 1024px'
     }
 
     movieClip({
         canvas: document.getElementById('movieClip1'),
         numberOfFrames: 161,
-        filepathFn: getFilePathname,
+        srcFn,
+        srcsetFn,
+        sizesFn,
     }).play()
 })()
